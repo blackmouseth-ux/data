@@ -159,12 +159,115 @@
   .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend-swatch { width: 14px; height: 14px; border-radius: 3px; }
 
+  /* Clickable BU */
+  tbody td.bu-name.clickable {
+    cursor: pointer; color: #b91c1c; text-decoration: none;
+    transition: background 0.15s;
+  }
+  tbody td.bu-name.clickable:hover { background: #fef3c7; }
+  tbody td.bu-name.clickable::after {
+    content: " 👥"; font-size: 11px; opacity: 0.6;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(17, 24, 39, 0.6);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+    animation: fadeIn 0.2s;
+  }
+  .modal-overlay.show { display: flex; }
+  @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+  @keyframes slideUp { from{transform:translateY(20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+
+  .modal {
+    background: #fff; border-radius: 16px;
+    max-width: 1100px; width: 100%; max-height: 90vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    animation: slideUp 0.25s;
+    overflow: hidden;
+  }
+  .modal-header {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+    color: #fff; padding: 20px 26px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-header h2 { font-size: 20px; font-weight: 700; }
+  .modal-header .sub-info { font-size: 13px; opacity: 0.92; margin-top: 3px; }
+  .modal-close {
+    background: rgba(255,255,255,0.22); border: none;
+    color: #fff; width: 36px; height: 36px; border-radius: 50%;
+    cursor: pointer; font-size: 20px; line-height: 1;
+    transition: background 0.15s; font-family: inherit;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.4); }
+
+  .modal-body { padding: 22px 26px; overflow-y: auto; flex: 1; }
+
+  /* Year tabs */
+  .year-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .year-tab {
+    padding: 8px 16px; border: 1.5px solid #e5e7eb; background: #fff;
+    border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 13px;
+    font-weight: 500; color: #4b5563; transition: all 0.15s;
+  }
+  .year-tab:hover { border-color: #dc2626; color: #dc2626; }
+  .year-tab.active { background: #dc2626; color: #fff; border-color: #dc2626; }
+  .year-tab .count {
+    display: inline-block; background: rgba(0,0,0,0.1); padding: 1px 8px;
+    border-radius: 999px; font-size: 11px; margin-left: 6px; font-weight: 600;
+  }
+  .year-tab.active .count { background: rgba(255,255,255,0.3); }
+
+  /* Employee table */
+  .emp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .emp-table thead th {
+    background: #fef3c7; color: #7f1d1d; font-weight: 700;
+    padding: 10px 8px; text-align: left;
+    border-bottom: 2px solid #fde68a;
+    position: sticky; top: 0;
+  }
+  .emp-table tbody td {
+    padding: 10px 8px; border-bottom: 1px solid #f3f4f6;
+    vertical-align: top;
+  }
+  .emp-table tbody tr:hover { background: #fffbeb; }
+  .emp-id { font-family: 'Courier New', monospace; font-size: 12px; color: #6b7280; }
+  .emp-name { font-weight: 600; color: #111827; }
+  .emp-position { color: #4b5563; }
+  .emp-dept { color: #6b7280; font-size: 12px; }
+  .emp-tenure { font-weight: 600; color: #7c3aed; white-space: nowrap; }
+  .emp-prize { font-weight: 700; color: #047857; white-space: nowrap; }
+  .emp-year-badge {
+    display: inline-block; padding: 2px 9px;
+    border-radius: 999px; font-size: 11px; font-weight: 700;
+    background: #fce7f3; color: #9d174d;
+  }
+  .emp-year-badge.y5  { background: #dbeafe; color: #1e40af; }
+  .emp-year-badge.y10 { background: #cffafe; color: #155e75; }
+  .emp-year-badge.y15 { background: #fef3c7; color: #92400e; }
+  .emp-year-badge.y20 { background: #fed7aa; color: #9a3412; }
+  .emp-year-badge.y25 { background: #fbcfe8; color: #9d174d; }
+  .emp-year-badge.y30 { background: #ddd6fe; color: #5b21b6; }
+
+  .empty-modal {
+    text-align: center; padding: 40px 20px; color: #9ca3af;
+  }
+
   @media (max-width: 768px) {
     body { padding: 14px; }
     header { padding: 24px 22px; }
     h1 { font-size: 22px; }
     .card .value { font-size: 26px; }
     header::after { font-size: 60px; right: 16px; }
+    .modal { max-height: 95vh; }
+    .modal-header { padding: 16px 20px; }
+    .modal-header h2 { font-size: 17px; }
+    .modal-body { padding: 16px 18px; }
+    .emp-table { font-size: 12px; }
   }
 </style>
 </head>
@@ -269,10 +372,31 @@
 
   <footer>
     ข้อมูล ณ วันที่ 17 พฤษภาคม 2569 · จัดทำจากไฟล์ภาพรวม.xlsx
+    <div style="margin-top:6px;font-size:12px;color:#9ca3af;">💡 คลิกที่ชื่อ BU เพื่อดูรายชื่อพนักงานที่ได้รับรางวัลอายุงาน</div>
   </footer>
 </div>
 
+<!-- Modal -->
+<div class="modal-overlay" id="empModal" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="modalTitle">รายชื่อพนักงาน</h2>
+        <div class="sub-info" id="modalSubInfo">รางวัลอายุงาน</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="ปิด">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="year-tabs" id="yearTabs"></div>
+      <div id="empTableWrap"></div>
+    </div>
+  </div>
+</div>
+
 <script>
+// Employee data (รางวัลอายุงาน)
+const employees = {"BPK":[{"id":"0453015","name":"นางสาวปริตา นันทะ","position":"ผู้จัดการฝ่ายการเงิน","dept":"การเงิน","start":"01/11/2010","y":15,"m":1,"d":30,"prize":15000},{"id":"0458009","name":"นายวศิน สุขใจดี","position":"ที่ปรึกษาด้านบริการ(SA)(อาวุโส)","dept":"ต้อนรับ","start":"02/03/2015","y":10,"m":9,"d":29,"prize":10000},{"id":"0458008","name":"นายณัฐพล พลนำ","position":"ที่ปรึกษาด้านบริการ(SA)","dept":"ต้อนรับ","start":"21/01/2015","y":10,"m":11,"d":10,"prize":10000},{"id":"0463135","name":"นายยศพัฒน์ ติชากูล","position":"ผู้จัดการส่วนขาย (SM)","dept":"ขาย PK ทีม 5","start":"01/10/2020","y":5,"m":2,"d":30,"prize":5000},{"id":"0463136","name":"นายอนุวัฒน์ โททำ","position":"ที่ปรึกษาการขาย (SC)","dept":"ขาย PK ทีม 5","start":"01/10/2020","y":5,"m":2,"d":30,"prize":5000},{"id":"0463130","name":"นายธนธรณ์ สาระศาลิน","position":"พนักงานช่าง","dept":"ซ่อม","start":"01/10/2020","y":5,"m":2,"d":30,"prize":5000},{"id":"0463030","name":"นายวุฒิพงศ์ รักศิลป์","position":"ที่ปรึกษาด้านบริการ(SA)","dept":"ต้อนรับ","start":"02/03/2020","y":5,"m":9,"d":29,"prize":5000},{"id":"0463003","name":"นางมุกดา เกื้อหนุน","position":"เจ้าหน้าที่ลูกค้าสัมพันธ์ (ฝ่ายขาย)","dept":"ลูกค้าสัมพันธ์","start":"03/02/2020","y":5,"m":10,"d":28,"prize":5000},{"id":"0463096","name":"นายพงศธร รัชกรทอง","position":"พนักงานงาน PDI","dept":"ธุรการขาย","start":"16/06/2020","y":5,"m":6,"d":15,"prize":5000},{"id":"0463002","name":"นายสุรศักดิ์ ทับนิล","position":"ผู้จัดการฝ่ายศูนย์บริการและอะไหล่","dept":"ต้อนรับ","start":"28/01/2020","y":5,"m":11,"d":3,"prize":5000},{"id":"0463004","name":"นายนนทพัฒน์ นาคมโน","position":"เจ้าหน้าที่อะไหล่(อาวุโส)","dept":"อะไหล่","start":"28/01/2020","y":5,"m":11,"d":3,"prize":5000}],"TRP":[{"id":"0163021","name":"นางสาวศิรินารถ สุขกิจ","position":"เจ้าหน้าที่ธุรการ","dept":"สำนักบริหาร","start":"08/12/2020","y":5,"m":0,"d":23,"prize":5000},{"id":"0163003","name":"นางสาวกมลชนก วารีอุดม","position":"เจ้าหน้าที่บัญชี (ด้านลูกหนี้)","dept":"ส่วนบัญชี-ด้านบัญชีลูกหนี้","start":"16/03/2020","y":5,"m":9,"d":15,"prize":5000},{"id":"0163004","name":"นางสาวจินทภา ศรพรหม","position":"เจ้าหน้าที่บัญชี (ด้านจ่ายเจ้าหนี้)","dept":"ส่วนบัญชี-ด้านจ่ายเจ้าหนี้","start":"27/04/2020","y":5,"m":8,"d":4,"prize":5000}],"VP":[{"id":"1443001","name":"นายประจักร์ สุวัตถี","position":"รองหัวหน้าแผนกซ่อมบำรุง","dept":"ส่วนแม่บ้าน","start":"04/04/2000","y":25,"m":8,"d":27,"prize":25000},{"id":"1453002","name":"นางสาวเกศรา เทพศร","position":"หัวหน้าแผนกทรัพย์สิน","dept":"ฝ่ายบริหารอาคารและทรัพย์สิน","start":"17/11/2010","y":15,"m":1,"d":14,"prize":15000},{"id":"1458012","name":"นางสาวนภัสวรรณ แสงเพชร","position":"ผู้ช่วยผู้จัดการส่วนการเงิน","dept":"สำนักบริหาร","start":"01/12/2015","y":10,"m":0,"d":30,"prize":10000}],"BMT":[{"id":"0753010","name":"นางสาวกัลยา ญาณรังษี","position":"ผู้ช่วยผู้จัดการฝ่ายศูนย์บริการและอะไหล่","dept":"ลูกค้าสัมพันธ์","start":"05/04/2010","y":15,"m":8,"d":26,"prize":15000},{"id":"0753033","name":"นายณัฐวุฒิ อุทัยเฉลิม","position":"ผู้จัดการฝ่ายปฏิบัติการขาย (OM)","dept":"ฝ่ายขาย ทีม 2","start":"09/09/2010","y":15,"m":3,"d":22,"prize":15000},{"id":"0758047","name":"นายณัฐวี ชัยสกุล","position":"หัวหน้าทีมช่าง","dept":"ซ่อม","start":"01/12/2015","y":10,"m":0,"d":30,"prize":10000},{"id":"0758025","name":"นางสาวพิศมัย สาระศรี","position":"ผู้จัดการส่วนลูกค้าสัมพันธ์","dept":"ลูกค้าสัมพันธ์","start":"06/07/2015","y":10,"m":5,"d":25,"prize":10000},{"id":"0758033","name":"นางสาวมาริสา ประสงค์ทรัพย์","position":"ผู้จัดการส่วนการเงิน","dept":"บัญชีและการเงิน","start":"24/08/2015","y":10,"m":4,"d":7,"prize":10000},{"id":"0763090","name":"นายชัยโรจน์ ฤทธิ์ทา","position":"พนักงานช่าง","dept":"ซ่อม","start":"01/08/2020","y":5,"m":4,"d":30,"prize":5000},{"id":"0763098","name":"นายณัตพณ อิสลามชาติไทย","position":"พนักงานช่าง","dept":"ซ่อม","start":"05/08/2020","y":5,"m":4,"d":26,"prize":5000},{"id":"0763153","name":"นางสาววันวิสา เต๊ะปานัน","position":"ผู้จัดการส่วนขาย (SM)","dept":"ฝ่ายขาย ทีม 5","start":"26/05/2020","y":5,"m":7,"d":5,"prize":5000}],"TLC":[{"id":"1948005","name":"นายภคพงษ์ ฟั่นทา","position":"ผู้ช่วยผู้จัดการส่วนซ่อม","dept":"หัวหน้าทีม(งานซ่อม)","start":"01/08/2005","y":20,"m":4,"d":30,"prize":20000},{"id":"1948006","name":"นายปิยวัฒน์ นามโคตร","position":"ผู้ช่วยผู้จัดการส่วนตรวจสอบคุณภาพ","dept":"หัวหน้าทีม(BP)","start":"01/08/2005","y":20,"m":4,"d":30,"prize":20000},{"id":"1948007","name":"นายปราโมช นุ่มนวล","position":"ผู้จัดการฝ่ายบริการ","dept":"หัวหน้าทีม(งานซ่อม)","start":"01/08/2005","y":20,"m":4,"d":30,"prize":20000},{"id":"1948001","name":"นางดวงกมล รัตนถาวร","position":"ผู้จัดการส่วนลูกค้าสัมพันธ์","dept":"Call Center และลูกค้าสัมพันธ์","start":"04/01/2005","y":20,"m":11,"d":27,"prize":20000},{"id":"1948002","name":"นายจิรัชชัย จินดาทอง","position":"หัวหน้างานแผนกตรวจสอบรถยนต์ใหม่","dept":"จัดสรรรถยนต์ใหม่","start":"04/02/2005","y":20,"m":10,"d":27,"prize":20000},{"id":"1948003","name":"นางสาวปริญา กรจันทร์","position":"ผู้ช่วยผู้จัดการแผนกรถใหม่","dept":"จัดสรรรถยนต์ใหม่","start":"07/02/2005","y":20,"m":10,"d":24,"prize":20000},{"id":"1948009","name":"นางสาวธนพัฒนา เตลิงกุล","position":"เจ้าหน้าที่ธุรการศูนย์บริการ(อาวุโส)","dept":"สนับสนุน (BP)","start":"15/12/2005","y":20,"m":0,"d":16,"prize":20000},{"id":"1948004","name":"นางสาวเบญญาภา กาญจนวิสูตร","position":"พนักงานช่าง","dept":"บริการซ่อมสีและตัวถัง","start":"16/02/2005","y":20,"m":10,"d":15,"prize":20000},{"id":"1953003","name":"นางสาววิจิตรา ขาใจ","position":"เจ้าหน้าที่จัดซื้อ(อาวุโส)","dept":"ธุรการจัดซื้อและอาคารสถานที่","start":"01/07/2010","y":15,"m":5,"d":30,"prize":15000},{"id":"1953005","name":"นายจักรพงษ์ นิลเจริญ","position":"พนักงานตรวจสภาพรถใหม่(PDI)(อาวุโส)","dept":"ปรับสภาพรถยนต์","start":"01/11/2010","y":15,"m":1,"d":30,"prize":15000},{"id":"1953004","name":"นายพรชัย สุฉายา","position":"หัวหน้าทีมช่าง","dept":"บริการทั่วไป (ซ่อม)","start":"02/08/2010","y":15,"m":4,"d":29,"prize":15000},{"id":"1953001","name":"นายสมพล บุตรเทศ","position":"พนักงานช่าง","dept":"บริการทั่วไป (ซ่อม)","start":"03/05/2010","y":15,"m":7,"d":28,"prize":15000},{"id":"1953002","name":"นายกรวุฒิ อ่อนศรี","position":"เจ้าหน้าที่ตรวจสอบรถยนต์ใหม่","dept":"จัดสรรรถยนต์ใหม่","start":"04/05/2010","y":15,"m":7,"d":27,"prize":15000},{"id":"1953006","name":"นางสาวกัณหา วงศาพูนทรัพย์","position":"หัวหน้าทีมขาย","dept":"ขายรถยนต์ใหม่","start":"06/12/2010","y":15,"m":0,"d":25,"prize":15000}],"TVP":[{"id":"0238004","name":"นายนภดล สุพละเศรษฐ์","position":"ประธานเจ้าหน้าที่บริหาร (CEO)","dept":"สำนักกรรมการบริหาร","start":"13/11/1995","y":30,"m":1,"d":18,"prize":30000},{"id":"0253042","name":"นายพรชัย สว่างใจ","position":"ผู้จัดการส่วนขายโครงการรถเช่า","dept":"ขายทีม F","start":"01/07/2010","y":15,"m":5,"d":30,"prize":15000},{"id":"0253023","name":"นายพงษ์พันธ์ สุขโชติ","position":"พนักงานปฏิบัติการรถเช่า(อาวุโส)","dept":"ขายทีม H","start":"10/05/2010","y":15,"m":7,"d":21,"prize":15000},{"id":"0253022","name":"นายพสิษฐ์ หนูเพชร","position":"ที่ปรึกษาการขายโครงการรถเช่า","dept":"ขายทีม I","start":"15/05/2010","y":15,"m":7,"d":16,"prize":15000},{"id":"0253055","name":"นางสาวพรสุรีย์ พรหมบุรี","position":"ผู้จัดการส่วนรับจองรถยนต์","dept":"ขายบุคคลระยะสั้น สุขุมวิท","start":"20/09/2010","y":15,"m":3,"d":11,"prize":15000},{"id":"0258062","name":"นางเมทินี บุญแก้ว","position":"ผู้อำนวยการบริหารต้นทุน(อาวุโส)","dept":"ส่วนจัดซื้อ จัดจ้าง","start":"01/09/2015","y":10,"m":3,"d":30,"prize":10000},{"id":"0258077","name":"นางสาวอมรรัตน์ ชุ่มคำ","position":"ผู้ช่วยผู้จัดการส่วนบัญชี","dept":"ส่วนงานบัญชี","start":"04/05/2015","y":10,"m":7,"d":27,"prize":10000},{"id":"0258071","name":"นางสาวพิชญา สุวรรณวาสนา","position":"ผู้จัดการส่วนขายโครงการรถเช่า","dept":"ขายทีม B","start":"09/11/2015","y":10,"m":1,"d":22,"prize":10000},{"id":"0258076","name":"นายศราวุธ กล่ำศรี","position":"Vehical Service Agent(VSA)","dept":"ขายบุคคลระยะสั้น สาขาหัวหิน","start":"12/01/2015","y":10,"m":11,"d":19,"prize":10000},{"id":"0258034","name":"นายภุชงค์ เขตจัตุรัส","position":"หัวหน้าทีมขายโครงการรถเช่า","dept":"ขายทีม C","start":"20/05/2015","y":10,"m":7,"d":11,"prize":10000},{"id":"0258047","name":"นางสาวสาริศา พรายระหาญ","position":"ผู้ช่วยผู้จัดการส่วนควบคุมยานพาหนะ","dept":"ส่วน Vehicle Control","start":"22/06/2015","y":10,"m":6,"d":9,"prize":10000},{"id":"0263010","name":"นายกำแพง เพ็งยอด","position":"Rental Service Officer","dept":"ขายบุคคลระยะสั้น สาขาดอนเมือง","start":"01/03/2020","y":5,"m":9,"d":30,"prize":5000},{"id":"0263018","name":"นางสาวสุพรรณี เขตต์ประดิษฐ","position":"ที่ปรึกษาการขายโครงการรถเช่า","dept":"ขายทีม H","start":"01/04/2020","y":5,"m":8,"d":30,"prize":5000},{"id":"0263024","name":"ว่าที่ร้อยตรีธฤษณุ ฐิติสถาวร","position":"เจ้าหน้าที่สินไหม","dept":"ส่วนประกันภัยตนเอง","start":"01/06/2020","y":5,"m":6,"d":30,"prize":5000},{"id":"0263039","name":"นางสาวสุลีพร ภาคแก้ว","position":"เจ้าหน้าที่ธุรการ","dept":"ฝ่ายขายอีซี่คาร์ (Flexi ระยะสั้น)","start":"02/09/2020","y":5,"m":3,"d":29,"prize":5000},{"id":"0263005","name":"นางสาวธิษตยา มูลมงคล","position":"ผู้จัดการฝ่ายบริหารสาขา","dept":"ขายบุคคลระยะสั้น สุขุมวิท","start":"03/02/2020","y":5,"m":10,"d":28,"prize":5000},{"id":"0263004","name":"นางสาวมณีวรรณ ภาโนมัย","position":"ผู้ช่วยผู้จัดการส่วนวิเคราะห์และวางแผนกลยุทธ์","dept":"ฝ่ายขายอีซี่คาร์ (ทีม 1)","start":"03/02/2020","y":5,"m":10,"d":28,"prize":5000},{"id":"0263033","name":"นางสาวแสงนภา เพชรเถื่อน","position":"Call Center","dept":"คอลเซ็นเตอร์ (Call Center)","start":"03/08/2020","y":5,"m":4,"d":28,"prize":5000},{"id":"0263032","name":"นางสาววรารัตน์ ถุงสมบัติ","position":"เจ้าหน้าที่คำนวณราคา","dept":"ส่วนคำนวณราคา","start":"03/08/2020","y":5,"m":4,"d":28,"prize":5000},{"id":"0263034","name":"นายธีศิษฎ์ ทองเหมือน","position":"ผู้ช่วยผู้จัดการส่วนงานประกันภัย","dept":"ส่วนประกันภัยตนเอง","start":"03/08/2020","y":5,"m":4,"d":28,"prize":5000},{"id":"0263026","name":"นางสาวชฎาพร สีสุทร","position":"ที่ปรึกษาการขายโครงการรถเช่า","dept":"ขายทีม F","start":"08/06/2020","y":5,"m":6,"d":23,"prize":5000},{"id":"0263013","name":"นายกิตติ รักษ์ศรีทอง","position":"Vehical Service Agent(VSA)","dept":"ขายบุคคลระยะสั้น สาขาภูเก็ต","start":"09/03/2020","y":5,"m":9,"d":22,"prize":5000},{"id":"0263055","name":"นายกฤตธัช มุตตารักษ์","position":"Rental Service Officer","dept":"ขายบุคคลระยะสั้น สาขาภูเก็ต","start":"13/11/2020","y":5,"m":1,"d":18,"prize":5000},{"id":"0263046","name":"นายยุทธพงษ์ สายสุด","position":"พนักงานงาน PDI","dept":"ฝ่ายซ่อมบำรุง","start":"19/10/2020","y":5,"m":2,"d":12,"prize":5000}],"ICCK (เพชรเกษม)":[{"id":"0348018","name":"นายกมนทัต ปัญญาธนภูมิ","position":"ผู้จัดการส่วนขายรถใหญ่","dept":"ขายรถใหญ่","start":"01/03/2005","y":20,"m":9,"d":30,"prize":20000},{"id":"0348017","name":"นายเมธาสิทธิ์ ทวีอาภา","position":"หัวหน้าทีมช่าง","dept":"หัวหน้าทีม(งานซ่อม)","start":"22/09/2005","y":20,"m":3,"d":9,"prize":20000},{"id":"0353003","name":"นายปรีชา ลิมปชัย","position":"ที่ปรึกษาการขาย (SC)","dept":"ขายทีม B","start":"22/02/2010","y":15,"m":10,"d":9,"prize":15000},{"id":"0358045","name":"นายกำพล จรูญพรภักดี","position":"ผู้จัดการทีมขาย (STM)","dept":"ขายทีม C","start":"01/09/2015","y":10,"m":3,"d":30,"prize":10000},{"id":"0358017","name":"นายเฉลิมไชย คงไทย","position":"ที่ปรึกษาด้านบริการ(SA)(อาวุโส)","dept":"ต้อนรับ (งานซ่อมสีและตัวถัง)","start":"02/03/2015","y":10,"m":9,"d":29,"prize":10000},{"id":"0358022","name":"นายนพดล กันธิดา","position":"ที่ปรึกษาด้านบริการ(SA)(อาวุโส)","dept":"รับรถ","start":"04/05/2015","y":10,"m":7,"d":27,"prize":10000},{"id":"0358062","name":"นางสาวมยุรา จงพูนทิพย์","position":"ผู้จัดการส่วนการเงิน","dept":"การเงิน","start":"09/02/2015","y":10,"m":10,"d":22,"prize":10000},{"id":"0358058","name":"นายอุดมทรัพย์ วชิรโภคา","position":"หัวหน้าทีมช่าง","dept":"หัวหน้าทีม(งานซ่อม)","start":"16/11/2015","y":10,"m":1,"d":15,"prize":10000},{"id":"0363068","name":"นายทรงพล ดีวัน","position":"พนักงานช่าง","dept":"ซ่อมสีและตัวถัง","start":"17/12/2020","y":5,"m":0,"d":14,"prize":5000}],"ICCK (กิ่งแก้ว)":[{"id":"0348016","name":"นายสยุมภูว์ เจียรวัฒนาวิทย์","position":"ผู้ช่วยผู้จัดการฝ่ายศูนย์บริการและอะไหล่","dept":"ศูนย์บริการ","start":"16/06/2005","y":20,"m":6,"d":15,"prize":20000},{"id":"0348014","name":"นางสาวภัณฑิรา สุวรรณเทศ","position":"ผู้จัดการทั่วไป","dept":"สำนักกรรมการบริหาร","start":"27/05/2005","y":20,"m":7,"d":4,"prize":20000},{"id":"0358044","name":"นายเอรวัฒน์ กองดี","position":"ที่ปรึกษาการขาย (SC)","dept":"ขายรถใหญ่","start":"01/09/2015","y":10,"m":3,"d":30,"prize":10000},{"id":"0358001","name":"นายศิริพงศ์ กิจแก้ว","position":"ผู้จัดการส่วนขาย (SM)","dept":"ขายรถใหญ่","start":"05/01/2015","y":10,"m":11,"d":26,"prize":10000},{"id":"0363002","name":"นางสาวอาภาศิริ สุพรรณโมก","position":"ที่ปรึกษาการขาย (SC)","dept":"ขายรถใหญ่","start":"06/01/2020","y":5,"m":11,"d":25,"prize":5000},{"id":"0363019","name":"นายสำราญ โม้จันทร์","position":"ผู้จัดการส่วนขาย (SM)","dept":"ขายรถใหญ่","start":"16/06/2020","y":5,"m":6,"d":15,"prize":5000},{"id":"0363062","name":"นางสาวรัชนก นาตาแสง","position":"ที่ปรึกษาด้านบริการ(SA)","dept":"รับรถ","start":"27/11/2020","y":5,"m":1,"d":4,"prize":5000}],"LAC (รามอินทรา)":[{"id":"0853033","name":"นางวาณี กรุดอินทร์","position":"ผู้จัดการฝ่ายทรัพยากรบุคคลและธุรการ","dept":"สำนักกรรมการบริหาร","start":"01/01/2010","y":15,"m":11,"d":30,"prize":15000},{"id":"0853024","name":"นางสาวอิสราภรณ์ ยศอาลัย","position":"ผู้จัดการส่วนขาย (SM)","dept":"ขายทีม A","start":"01/11/2010","y":15,"m":1,"d":30,"prize":15000},{"id":"0853010","name":"นางสาวจันทร์เพ็ญ เกตุพันธ์","position":"ผู้จัดการทีมขาย (STM)","dept":"ขายทีม A","start":"15/06/2010","y":15,"m":6,"d":16,"prize":15000},{"id":"0853008","name":"นางสาวหนึ่งฤทัย รู้อยู่","position":"เจ้าหน้าที่อะไหล่(อาวุโส)","dept":"อะไหล่","start":"19/04/2010","y":15,"m":8,"d":12,"prize":15000},{"id":"0853016","name":"นางสาวศิริพร สาสิงห์","position":"เจ้าหน้าที่แคชเชียร์","dept":"บัญชีและการเงิน","start":"26/08/2010","y":15,"m":4,"d":5,"prize":15000},{"id":"0858005","name":"นายบุญชิด ธานี","position":"พนักงานช่าง(อาวุโส)","dept":"ซ่อม","start":"21/04/2015","y":10,"m":8,"d":10,"prize":10000},{"id":"0863004","name":"นางสาวญาฎาฐ์มาศช์ เตรียมพล","position":"ที่ปรึกษาการขาย (SC)","dept":"ขายทีม A","start":"02/05/2020","y":5,"m":7,"d":29,"prize":5000},{"id":"0863008","name":"นางสาววาสนา สว่างศรี","position":"ที่ปรึกษาการขาย (SC)","dept":"ขายทีม O","start":"16/09/2020","y":5,"m":3,"d":15,"prize":5000}],"LAC (สุขุมวิท)":[{"id":"0863007","name":"นายวนิรันดร์ หาญกล้า","position":"พนักงานช่าง","dept":"ซ่อม","start":"03/08/2020","y":5,"m":4,"d":28,"prize":5000},{"id":"0863006","name":"นายวิรุฬ ประทุมศรี","position":"พนักงานช่าง","dept":"ซ่อม","start":"16/07/2020","y":5,"m":5,"d":15,"prize":5000}],"VPA":[{"id":"0558089","name":"นายสุเมธ มูลประหัส","position":"ที่ปรึกษาด้านบริการ(SA)(อาวุโส)","dept":"ต้อนรับ","start":"01/09/2015","y":10,"m":3,"d":30,"prize":10000},{"id":"0563037","name":"นายชลชาติ แววคุ้ม","position":"ที่ปรึกษาด้านบริการ(SA)","dept":"ต้อนรับ","start":"21/02/2020","y":5,"m":10,"d":10,"prize":5000}]};
+
 // Raw data from Excel
 const data = [
   // BU, [5y,10y,15y,20y,25y,30y], gold, advisor, tech, [acc, salesSupp, genSupp], primary, middle, total, budget, status
@@ -321,8 +445,11 @@ function renderRows(filter='all', searchText='') {
     const statusPill = d.status === 'complete'
       ? '<span class="status-pill status-complete">✓ ส่งข้อมูลครบ</span>'
       : '<span class="status-pill status-pending">⏳ ยังไม่ส่ง</span>';
+    const hasEmployees = employees[d.bu] && employees[d.bu].length > 0;
+    const buCellClass = hasEmployees ? 'bu-name clickable' : 'bu-name';
+    const buCellAttr = hasEmployees ? ` onclick="openModal('${d.bu.replace(/'/g, "\\'")}')" title="คลิกเพื่อดูรายชื่อพนักงาน"` : '';
     tr.innerHTML = `
-      <td class="bu-name">${d.bu}</td>
+      <td class="${buCellClass}"${buCellAttr}>${d.bu}</td>
       <td>${fmt(d.years[0])}</td>
       <td>${fmt(d.years[1])}</td>
       <td>${fmt(d.years[2])}</td>
@@ -362,6 +489,94 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 
 // initial render
 renderRows();
+
+// ============ Modal logic ============
+let currentBU = null;
+let currentYearFilter = 'all';
+
+function openModal(bu) {
+  currentBU = bu;
+  currentYearFilter = 'all';
+  const list = employees[bu] || [];
+  document.getElementById('modalTitle').textContent = '👥 พนักงาน BU: ' + bu;
+  document.getElementById('modalSubInfo').textContent =
+    'รางวัลอายุงาน · ทั้งหมด ' + list.length + ' คน · งบประมาณ ฿' +
+    list.reduce((s, e) => s + (e.prize || 0), 0).toLocaleString();
+  renderYearTabs(list);
+  renderEmpTable(list);
+  document.getElementById('empModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('empModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function renderYearTabs(list) {
+  const wrap = document.getElementById('yearTabs');
+  // Count by years
+  const counts = {};
+  list.forEach(e => { counts[e.y] = (counts[e.y] || 0) + 1; });
+  const years = Object.keys(counts).map(Number).sort((a,b) => a-b);
+  let html = `<button class="year-tab ${currentYearFilter==='all'?'active':''}" onclick="filterByYear('all')">ทั้งหมด <span class="count">${list.length}</span></button>`;
+  years.forEach(y => {
+    html += `<button class="year-tab ${currentYearFilter==y?'active':''}" onclick="filterByYear(${y})">${y} ปี <span class="count">${counts[y]}</span></button>`;
+  });
+  wrap.innerHTML = html;
+}
+
+function filterByYear(y) {
+  currentYearFilter = y;
+  const list = employees[currentBU] || [];
+  renderYearTabs(list);
+  renderEmpTable(list);
+}
+
+function renderEmpTable(list) {
+  const wrap = document.getElementById('empTableWrap');
+  let filtered = list;
+  if (currentYearFilter !== 'all') {
+    filtered = list.filter(e => e.y === currentYearFilter);
+  }
+  if (filtered.length === 0) {
+    wrap.innerHTML = '<div class="empty-modal">ไม่มีรายชื่อพนักงานในเงื่อนไขนี้</div>';
+    return;
+  }
+  let html = `<div style="overflow-x:auto;"><table class="emp-table">
+    <thead><tr>
+      <th style="width:40px;">#</th>
+      <th>รหัสพนักงาน</th>
+      <th>ชื่อ-นามสกุล / ตำแหน่ง</th>
+      <th>หน่วยงานสังกัด</th>
+      <th>วันที่เริ่มงาน</th>
+      <th>อายุงาน</th>
+      <th>รางวัล</th>
+      <th>เงินรางวัล</th>
+    </tr></thead><tbody>`;
+  filtered.forEach((e, i) => {
+    html += `<tr>
+      <td>${i+1}</td>
+      <td class="emp-id">${e.id}</td>
+      <td>
+        <div class="emp-name">${e.name}</div>
+        <div class="emp-position">${e.position}</div>
+      </td>
+      <td class="emp-dept">${e.dept}</td>
+      <td class="emp-dept">${e.start}</td>
+      <td class="emp-tenure">${e.y} ปี ${e.m} เดือน ${e.d} วัน</td>
+      <td><span class="emp-year-badge y${e.y}">รางวัลอายุงาน ${e.y} ปี</span></td>
+      <td class="emp-prize">฿${e.prize.toLocaleString()}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  wrap.innerHTML = html;
+}
+
+// ESC to close
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
 </script>
 </body>
 </html>
